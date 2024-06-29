@@ -3,7 +3,7 @@ import prisma from '../../prisma/client/prismaClient'
 import { Users } from '@prisma/client'
 
 @Injectable()
-export class AuthService {
+export class RegiserService {
   async getUser(): Promise<Users[]> {
     return prisma.users.findMany({})
   }
