@@ -3,16 +3,16 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
-model Users {
+model User {
   id           Int      @id @default(autoincrement())
   email        String   @unique
   username     String   @unique
   passwordHash String
-  image        String
-  createdAt    DateTime @default(dbgenerated("NOW()")) @db.Timestamptz(3)
-  updatedAt    DateTime @updatedAt @db.Timestamptz(3)
+  image        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
