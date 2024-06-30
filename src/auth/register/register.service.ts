@@ -4,8 +4,11 @@ import prisma from '../../../prisma/client/prismaClient'
 import { ErrorResponse, Response, SuccessResponse } from '../../types/Response'
 import getSuccessMessage from '../../utils/getSuccessMessage'
 import getErrorMessage from '../../utils/getErrorMessage'
-import validator, { ValidatorErrors } from '../../utils/validator'
+import { ValidatorErrors } from '../../utils/validator'
 import { Prisma, User } from '@prisma/client'
+import validateEmail from '../../utils/validateEmail'
+import validatePassword from '../../utils/validatePassword'
+import validateUsername from '../../utils/validateUsername'
 
 type Fields = 'email' | 'password' | 'username'
 type UniqueFields = 'email' | 'username'
@@ -64,56 +67,22 @@ export class RegisterService {
     const result: Partial<RegisterData> = {}
     const errors: Errors[] = []
 
-    this.validateEmail(queryBody.email, result, errors)
-    this.validateUsername(queryBody.username, result, errors)
-    this.validatePassword(queryBody.password, result, errors)
+    const emailValidationError = validateEmail(queryBody.email)
+    if (emailValidationError) {
+      errors.push(emailValidationError)
+    }
+    const usernameValidationError = validateUsername(queryBody.username)
+    if (usernameValidationError) {
+      errors.push(usernameValidationError)
+    }
+    const passwordValidationError = validatePassword(queryBody.password)
+    if (passwordValidationError) {
+      errors.push(passwordValidationError)
+    }
 
     if (errors.length) {
       return getErrorMessage<Errors[]>(errors)
     }
     return getSuccessMessage<'Register data is valid', RegisterData>('Register data is valid', result as RegisterData)
-  }
-
-  private validateEmail(email: unknown, result: Partial<RegisterData>, errors: Errors[]): void {
-    const emailError = validator<'email'>(email, {
-      type: 'string',
-      name: 'email',
-      regExp: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-      maxLength: 64,
-      notEmpty: true,
-    })
-    if (emailError) {
-      errors.push(emailError)
-    } else {
-      result.email = email as string
-    }
-  }
-
-  private validateUsername(username: unknown, result: Partial<RegisterData>, errors: Errors[]): void {
-    const usernameError = validator<'username'>(username, {
-      type: 'string',
-      name: 'username',
-      maxLength: 64,
-      notEmpty: true,
-    })
-    if (usernameError) {
-      errors.push(usernameError)
-    } else {
-      result.username = username as string
-    }
-  }
-
-  private validatePassword(password: unknown, result: Partial<RegisterData>, errors: Errors[]): void {
-    const passwordError = validator<'password'>(password, {
-      type: 'string',
-      name: 'password',
-      maxLength: 64,
-      notEmpty: true,
-    })
-    if (passwordError) {
-      errors.push(passwordError)
-    } else {
-      result.password = password as string
-    }
   }
 }
