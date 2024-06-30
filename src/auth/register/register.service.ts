@@ -9,6 +9,7 @@ import { Prisma, User } from '@prisma/client'
 import validateEmail from '../../utils/validateEmail'
 import validatePassword from '../../utils/validatePassword'
 import validateUsername from '../../utils/validateUsername'
+import * as bcrypt from 'bcryptjs'
 
 type Fields = 'email' | 'password' | 'username'
 type UniqueFields = 'email' | 'username'
@@ -37,7 +38,7 @@ export class RegisterService {
         data: {
           email: data.email,
           username: data.username,
-          passwordHash: data.password,
+          passwordHash: await bcrypt.hash(data.password, await bcrypt.genSalt(16)),
         },
       })
       if (newUser) {
