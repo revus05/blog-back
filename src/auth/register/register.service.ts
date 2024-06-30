@@ -70,14 +70,20 @@ export class RegisterService {
     const emailValidationError = validateEmail(queryBody.email)
     if (emailValidationError) {
       errors.push(emailValidationError)
+    } else {
+      result.email = queryBody.email as string
     }
     const usernameValidationError = validateUsername(queryBody.username)
     if (usernameValidationError) {
       errors.push(usernameValidationError)
+    } else {
+      result.username = queryBody.username as string
     }
     const passwordValidationError = validatePassword(queryBody.password)
     if (passwordValidationError) {
       errors.push(passwordValidationError)
+    } else {
+      result.password = queryBody.password as string
     }
 
     if (errors.length) {
